@@ -53,7 +53,13 @@ WHITELIST_SUBDOMAIN = 'wrapdb.mesonbuild.com'
 
 ALL_TYPES = ['file', 'git', 'hg', 'svn', 'redirect']
 
-PATCH = shutil.which('patch')
+if mesonlib.is_windows():
+    from ..programs import ExternalProgram
+    _patch = ExternalProgram('patch', silent=True, exclude_paths=[r'C:\Strawberry\c\bin'])
+    PATCH = _patch.get_path() if _patch.found() else None
+else:
+    PATCH = shutil.which('patch')
+
 
 def whitelist_wrapdb(urlstr: str) -> urllib.parse.ParseResult:
     """ raises WrapException if not whitelisted subdomain """
